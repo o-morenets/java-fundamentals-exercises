@@ -31,12 +31,8 @@ public class PrimeNumbers {
      * @return an infinite int stream of prime numbers
      */
     public static IntStream stream() {
-        return IntStream.iterate(
-                2, seed -> IntStream.iterate(seed + 1, i -> i + 1)
-                        .dropWhile(i -> IntStream.range(2, i).anyMatch(p -> i % p == 0))
-                        .findFirst()
-                        .orElseThrow()
-        );
+        return IntStream.iterate(2, i -> i + 1)
+                .filter(n -> IntStream.range(2, n).noneMatch(i -> n % i == 0));
     }
 
     /**
@@ -76,11 +72,9 @@ public class PrimeNumbers {
      * @param consumer a logic that should be applied to the found prime number
      */
     public static void processByIndex(int idx, IntConsumer consumer) {
-        consumer.accept(
-                stream().skip(idx)
-                        .findFirst()
-                        .orElseThrow()
-        );
+        stream().skip(idx)
+                .findFirst()
+                .ifPresent(consumer);
     }
 
     /**
@@ -94,16 +88,8 @@ public class PrimeNumbers {
      * @return a map with prime number grouped by the amount of digits
      */
     public static Map<Integer, List<Integer>> groupByAmountOfDigits(int n) {
-        return stream(n).boxed().collect(Collectors.groupingBy(PrimeNumbers::calcDigits));
-    }
-
-    private static Integer calcDigits(Integer num) {
-        Integer numDigits = 1;
-
-        while ((num = num / 10) != 0) {
-            numDigits++;
-        }
-
-        return numDigits;
+        return stream(n)
+                .boxed()
+                .collect(Collectors.groupingBy(p -> (int) Math.log10(p) + 1));
     }
 }
