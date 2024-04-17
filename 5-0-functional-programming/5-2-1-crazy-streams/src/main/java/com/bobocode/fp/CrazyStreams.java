@@ -1,5 +1,6 @@
 package com.bobocode.fp;
 
+import com.bobocode.fp.exception.EntityNotFoundException;
 import com.bobocode.model.Account;
 import com.bobocode.model.Sex;
 import com.bobocode.util.ExerciseNotCompletedException;
@@ -87,9 +88,9 @@ public class CrazyStreams {
      * @return total balance of all accounts
      */
     public BigDecimal calculateTotalBalance() {
-        return BigDecimal.valueOf(accounts.stream()
-                .mapToLong(a -> a.getBalance().longValue())
-                .sum());
+        return accounts.stream()
+                .map(Account::getBalance)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     /**
@@ -98,7 +99,9 @@ public class CrazyStreams {
      * @return list of accounts sorted by first and last names
      */
     public List<Account> sortByFirstAndLastNames() {
-        throw new ExerciseNotCompletedException();
+        return accounts.stream()
+                .sorted(Comparator.comparing(Account::getFirstName).thenComparing(Account::getLastName))
+                .toList();
     }
 
     /**
@@ -108,7 +111,8 @@ public class CrazyStreams {
      * @return true if there is an account that has an email with provided domain
      */
     public boolean containsAccountWithEmailDomain(String emailDomain) {
-        throw new ExerciseNotCompletedException();
+        return accounts.stream()
+                .anyMatch(a -> a.getEmail().split("@")[1].equals(emailDomain));
     }
 
     /**
@@ -119,7 +123,11 @@ public class CrazyStreams {
      * @return account balance
      */
     public BigDecimal getBalanceByEmail(String email) {
-        throw new ExerciseNotCompletedException();
+        return accounts.stream()
+                .filter(a -> a.getEmail().equals(email))
+                .findAny()
+                .map(Account::getBalance)
+                .orElseThrow(() -> new EntityNotFoundException("Cannot find Account by email=" + email));
     }
 
     /**
