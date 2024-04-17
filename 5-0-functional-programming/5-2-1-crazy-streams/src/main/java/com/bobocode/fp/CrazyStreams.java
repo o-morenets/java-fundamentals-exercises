@@ -1,12 +1,14 @@
 package com.bobocode.fp;
 
 import com.bobocode.model.Account;
+import com.bobocode.model.Sex;
 import com.bobocode.util.ExerciseNotCompletedException;
 import lombok.AllArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.Month;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * {@link CrazyStreams} is an exercise class. Each method represent some operation with a collection of accounts that
@@ -30,7 +32,8 @@ public class CrazyStreams {
      * @return account with max balance wrapped with optional
      */
     public Optional<Account> findRichestPerson() {
-        throw new ExerciseNotCompletedException();
+        return accounts.stream()
+                .max(Comparator.comparing(Account::getBalance));
     }
 
     /**
@@ -40,7 +43,9 @@ public class CrazyStreams {
      * @return a list of accounts
      */
     public List<Account> findAccountsByBirthdayMonth(Month birthdayMonth) {
-        throw new ExerciseNotCompletedException();
+        return accounts.stream()
+                .filter(a -> a.getBirthday().getMonth() == birthdayMonth)
+                .toList();
     }
 
     /**
@@ -50,7 +55,8 @@ public class CrazyStreams {
      * @return a map where key is true or false, and value is list of male, and female accounts
      */
     public Map<Boolean, List<Account>> partitionMaleAccounts() {
-        throw new ExerciseNotCompletedException();
+        return accounts.stream()
+                .collect(Collectors.partitioningBy(a -> a.getSex() == Sex.MALE));
     }
 
     /**
@@ -60,7 +66,8 @@ public class CrazyStreams {
      * @return a map where key is an email domain and value is a list of all account with such email
      */
     public Map<String, List<Account>> groupAccountsByEmailDomain() {
-        throw new ExerciseNotCompletedException();
+        return accounts.stream()
+                .collect(Collectors.groupingBy(a -> a.getEmail().split("@")[1]));
     }
 
     /**
@@ -69,7 +76,10 @@ public class CrazyStreams {
      * @return total number of letters of first and last names of all accounts
      */
     public int getNumOfLettersInFirstAndLastNames() {
-        throw new ExerciseNotCompletedException();
+        return accounts.stream()
+                .map(a -> a.getFirstName().length() + a.getLastName().length())
+                .mapToInt(Integer::intValue)
+                .sum();
     }
 
     /**
