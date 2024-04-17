@@ -77,8 +77,7 @@ public class CrazyStreams {
      */
     public int getNumOfLettersInFirstAndLastNames() {
         return accounts.stream()
-                .map(a -> a.getFirstName().length() + a.getLastName().length())
-                .mapToInt(Integer::intValue)
+                .mapToInt(a -> a.getFirstName().length() + a.getLastName().length())
                 .sum();
     }
 
@@ -88,7 +87,9 @@ public class CrazyStreams {
      * @return total balance of all accounts
      */
     public BigDecimal calculateTotalBalance() {
-        throw new ExerciseNotCompletedException();
+        return BigDecimal.valueOf(accounts.stream()
+                .mapToLong(a -> a.getBalance().longValue())
+                .sum());
     }
 
     /**
