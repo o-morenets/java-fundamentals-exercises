@@ -10,8 +10,9 @@ import java.math.BigDecimal;
 import java.time.Month;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.*;
 
 /**
  * {@link CrazyStreams} is an exercise class. Each method represent some operation with a collection of accounts that
@@ -59,7 +60,7 @@ public class CrazyStreams {
      */
     public Map<Boolean, List<Account>> partitionMaleAccounts() {
         return accounts.stream()
-                .collect(Collectors.partitioningBy(a -> a.getSex() == Sex.MALE));
+                .collect(partitioningBy(a -> a.getSex() == Sex.MALE));
     }
 
     /**
@@ -70,7 +71,7 @@ public class CrazyStreams {
      */
     public Map<String, List<Account>> groupAccountsByEmailDomain() {
         return accounts.stream()
-                .collect(Collectors.groupingBy(a -> a.getEmail().split("@")[1]));
+                .collect(groupingBy(a -> a.getEmail().split("@")[1]));
     }
 
     /**
@@ -139,7 +140,7 @@ public class CrazyStreams {
      */
     public Map<Long, Account> collectAccountsById() {
         return accounts.stream()
-                .collect(Collectors.toMap(Account::getId, Function.identity()));
+                .collect(toMap(Account::getId, Function.identity()));
     }
 
     /**
@@ -152,7 +153,7 @@ public class CrazyStreams {
     public Map<String, BigDecimal> collectBalancesByEmailForAccountsCreatedOn(int year) {
         return accounts.stream()
                 .filter(a -> a.getCreationDate().getYear() == year)
-                .collect(Collectors.toMap(Account::getEmail, Account::getBalance));
+                .collect(toMap(Account::getEmail, Account::getBalance));
     }
 
     /**
@@ -163,7 +164,8 @@ public class CrazyStreams {
      */
     public Map<String, Set<String>> groupFirstNamesByLastNames() {
         return accounts.stream()
-                .collect(Collectors.groupingBy(Account::getLastName, Collectors.mapping(Account::getFirstName, Collectors.toSet())));
+                .collect(groupingBy(Account::getLastName,
+                        mapping(Account::getFirstName, toSet())));
     }
 
     /**
@@ -174,8 +176,8 @@ public class CrazyStreams {
      */
     public Map<Month, String> groupCommaSeparatedFirstNamesByBirthdayMonth() {
         return accounts.stream()
-                .collect(Collectors.groupingBy(a -> a.getBirthday().getMonth(),
-                        Collectors.mapping(Account::getFirstName, Collectors.joining(", "))));
+                .collect(groupingBy(a -> a.getBirthday().getMonth(),
+                        mapping(Account::getFirstName, joining(", "))));
     }
 
     /**
@@ -186,9 +188,9 @@ public class CrazyStreams {
      */
     public Map<Month, BigDecimal> groupTotalBalanceByCreationMonth() {
         return accounts.stream()
-                .collect(Collectors.groupingBy(
+                .collect(groupingBy(
                         a -> a.getCreationDate().getMonth(),
-                        Collectors.mapping(Account::getBalance, Collectors.reducing(BigDecimal.ZERO, BigDecimal::add)))
+                        mapping(Account::getBalance, reducing(BigDecimal.ZERO, BigDecimal::add)))
                 );
     }
 
@@ -202,7 +204,7 @@ public class CrazyStreams {
         return accounts.stream()
                 .flatMapToInt(a -> a.getFirstName().chars())
                 .mapToObj(i -> (char) i)
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+                .collect(groupingBy(Function.identity(), counting()));
     }
 
     /**
@@ -218,7 +220,7 @@ public class CrazyStreams {
                 .filter(name -> name.length() >= nameLengthBound)
                 .flatMapToInt(String::chars)
                 .mapToObj(i -> (char) i)
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+                .collect(groupingBy(Function.identity(), counting()));
     }
 
 }
