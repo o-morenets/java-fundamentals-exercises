@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import java.math.BigDecimal;
 import java.time.Month;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -136,7 +137,8 @@ public class CrazyStreams {
      * @return map of accounts by its ids
      */
     public Map<Long, Account> collectAccountsById() {
-        throw new ExerciseNotCompletedException();
+        return accounts.stream()
+                .collect(Collectors.toMap(Account::getId, Function.identity()));
     }
 
     /**
@@ -147,7 +149,9 @@ public class CrazyStreams {
      * @return map of account by its ids the were created in a particular year
      */
     public Map<String, BigDecimal> collectBalancesByEmailForAccountsCreatedOn(int year) {
-        throw new ExerciseNotCompletedException();
+        return accounts.stream()
+                .filter(a -> a.getCreationDate().getYear() == year)
+                .collect(Collectors.toMap(Account::getEmail, Account::getBalance));
     }
 
     /**
@@ -157,7 +161,8 @@ public class CrazyStreams {
      * @return a map where key is a last name and value is a set of first names
      */
     public Map<String, Set<String>> groupFirstNamesByLastNames() {
-        throw new ExerciseNotCompletedException();
+        return accounts.stream()
+                .collect(Collectors.groupingBy(Account::getLastName, Collectors.mapping(Account::getFirstName, Collectors.toSet())));
     }
 
     /**
@@ -167,7 +172,9 @@ public class CrazyStreams {
      * @return a map where a key is a birthday month and value is comma-separated first names
      */
     public Map<Month, String> groupCommaSeparatedFirstNamesByBirthdayMonth() {
-        throw new ExerciseNotCompletedException();
+        return accounts.stream()
+                .collect(Collectors.groupingBy(a -> a.getBirthday().getMonth(),
+                        Collectors.mapping(Account::getFirstName, Collectors.joining(", "))));
     }
 
     /**
@@ -177,7 +184,11 @@ public class CrazyStreams {
      * @return a map where key is a creation month and value is total balance of all accounts created in that month
      */
     public Map<Month, BigDecimal> groupTotalBalanceByCreationMonth() {
-        throw new ExerciseNotCompletedException();
+        return accounts.stream()
+                .collect(Collectors.groupingBy(
+                        a -> a.getCreationDate().getMonth(),
+                        Collectors.mapping(Account::getBalance, Collectors.reducing(BigDecimal.ZERO, BigDecimal::add)))
+                );
     }
 
     /**
@@ -187,7 +198,10 @@ public class CrazyStreams {
      * @return a map where key is a letter and value is its count in all first names
      */
     public Map<Character, Long> getCharacterFrequencyInFirstNames() {
-        throw new ExerciseNotCompletedException();
+        return accounts.stream()
+                .flatMapToInt(a -> a.getFirstName().chars())
+                .mapToObj(i -> (char) i)
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
     }
 
     /**
@@ -198,7 +212,11 @@ public class CrazyStreams {
      * @return a map where key is a letter and value is its count ignoring case in all first and last names
      */
     public Map<Character, Long> getCharacterFrequencyIgnoreCaseInFirstAndLastNames(int nameLengthBound) {
-        throw new ExerciseNotCompletedException();
+        return accounts.stream()
+                .filter(a -> a.getFirstName().length() >= nameLengthBound && a.getLastName().length() >= nameLengthBound)
+                .flatMapToInt(a -> (a.getFirstName().toLowerCase() + a.getLastName().toLowerCase()).chars())
+                .mapToObj(i -> (char) i)
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
     }
 
 }
